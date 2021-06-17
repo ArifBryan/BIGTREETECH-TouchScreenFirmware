@@ -75,7 +75,7 @@
  *
  * Options: [2400: 0, 9600: 1, 19200: 2, 38400: 3, 57600: 4, 115200: 5, 250000: 6, 500000: 7, 1000000: 8]
  */
-#define BAUDRATE 5  // Default: 5
+#define BAUDRATE 8  // Default: 5
 
 /**
  * Default Primary Language (for Touch-Mode only)
@@ -101,8 +101,8 @@
 #define TITLE_BACKGROUND_COLOR      1  // Title background color (Default: 1)
 #define BACKGROUND_COLOR            1  // Background color (Default: 1)
 #define FONT_COLOR                  0  // Font foreground color (Default: 0)
-#define REMINDER_FONT_COLOR         2  // Reminder font color, such as: "No print attached", "Busy processing", etc. (Default: 2)
-#define VOLUME_REMINDER_FONT_COLOR  5  // Volume reminder font color, such as: "Card inserted", "Card removed" (Default: 5)
+#define REMINDER_FONT_COLOR         0  // Reminder font color, such as: "No print attached", "Busy processing", etc. (Default: 2)
+#define VOLUME_REMINDER_FONT_COLOR  0  // Volume reminder font color, such as: "Card inserted", "Card removed" (Default: 5)
 #define STATUS_XYZ_BG_COLOR        15  // Background color for X Y Z position display in Status Screen. (Default: 15)
 #define LISTVIEW_BORDER_COLOR      15  // Border color in List view (Default: 15)
 #define LISTVIEW_ICON_COLOR        15  // icon color in List view (Default: 15)
@@ -180,8 +180,8 @@
                            // cooling if marlin supports ontroller fan (M710).
 
 #define PREHEAT_LABELS {"PLA", "PETG", "ABS", "WOOD", "TPU", "NYLON"}
-#define PREHEAT_HOTEND {200,   240,    230,   170,    220,   250}
-#define PREHEAT_BED    { 60,    70,     90,    50,     50,    90}
+#define PREHEAT_HOTEND {205,   245,    230,   170,    220,   250}
+#define PREHEAT_BED    { 60,    80,     90,    50,     50,    90}
 
 #define HEAT_MAX_TEMP   {275,       275,       275,       275,       275,       275,       150,    60}
 #define HEAT_SIGN_ID    {"T0:",     "T1:",     "T2:",     "T3:",     "T4:",     "T5:",     "B:",   "C:"}
@@ -206,7 +206,7 @@
                         "M710 S%d\n",    "M710 I%d\n" }
 
 // Speed/flow rate names displayed in status screen
-#define SPEED_ID {"Sp.", "Fr."}  // (speed, flow rate)
+#define SPEED_ID {"SP.", "FL."}  // (speed, flow rate)
 
 // Axes names displayed in Parameter Settings menu
 #define AXIS_DISPLAY_ID    {"X", "Y", "Z", "E0", "E1"}  // (X, Y, Z, E0, E1)
@@ -259,7 +259,7 @@
  */
 #define LEVELING_EDGE_DISTANCE        20  // Inset distance from bed's edge for calculating leveling point location
 #define LEVELING_POINT_Z            0.2f  // Z-axis position when nozzle stays for leveling
-#define LEVELING_POINT_MOVE_Z      10.0f  // Z-axis position when nozzle move to next point
+#define LEVELING_POINT_MOVE_Z      5.0f  // Z-axis position when nozzle move to next point
 #define LEVELING_POINT_XY_FEEDRATE  6000  // (mm/min) X and Y axes move feedrate
 #define LEVELING_POINT_Z_FEEDRATE    600  // (mm/min) Z axis move feedrate
 
@@ -271,7 +271,7 @@
 // Z Fade limits
 #define Z_FADE_MIN_VALUE      0.0f
 #define Z_FADE_MAX_VALUE     20.0f
-#define Z_FADE_DEFAULT_VALUE 10.0f
+#define Z_FADE_DEFAULT_VALUE 5.0f
 
 // Probe Offset limits
 #define PROBE_Z_OFFSET_MIN_VALUE     -20.0f
@@ -355,7 +355,7 @@
  *
  * NOTE: Enable it, in case Marlin firmware does not properly support M600 on the mainboard.
  */
-#define EMULATE_M600 true  // To enabled: true | To disabled: false (Default: true)
+#define EMULATE_M600 false  // To enabled: true | To disabled: false (Default: true)
 
 /**
  * M601: Pause Print
@@ -419,8 +419,8 @@
  *          6: 50 Percent,   7: 60 Percent,   8: 70 Percent,
  *          9: 80 Percent,  10: 90 Percent,  11: 100 Percent
  */
-#define DEFAULT_LCD_BRIGHTNESS       11  // Default: 11
-#define DEFAULT_LCD_IDLE_BRIGHTNESS   3  // Default: 3
+#define DEFAULT_LCD_BRIGHTNESS       3  // Default: 11
+#define DEFAULT_LCD_IDLE_BRIGHTNESS  2  // Default: 3
 
 /**
  * Idle LCD diming Timer (TFT28 V3.0, TFT35 E3.0, TFT43 V3.0, TFT50 V3.0 & TFT70 V3.0)
@@ -431,7 +431,7 @@
  *          3: 30 Seconds,   4: 60 Seconds,     5: 120 Seconds,
  *          6: 300 Seconds,  7: CUSTOM Seconds
  */
-#define DEFAULT_LCD_IDLE_TIMER  0  // Default: 0
+#define DEFAULT_LCD_IDLE_TIMER  5  // Default: 0
 #define LCD_DIM_CUSTOM_SECONDS (10 * 60)  // Custom value in seconds. This will be used if DEFAULT_LCD_IDLE_TIMER
                                           // is set to 7 (CUSTOM Seconds).
 
@@ -472,7 +472,7 @@
  *  POPUP: Display a popup window for user confirmation.
  *  TOAST: A Toast notification is displayed for few seconds. No user interaction is needed.
  */
-#define ACK_NOTIFICATION_STYLE 1  // Default: 1
+#define ACK_NOTIFICATION_STYLE 0  // Default: 1
 
 // Fan speed as a percentage instead of PWM value
 #define SHOW_FAN_PERCENTAGE true  // To enabled: true | To disabled: false (Default: true)
@@ -571,7 +571,7 @@
  *    If you choose "Base64 PNG" on such a low RAM device it will automatically
  *    downgraded to "RGB565 bitmap" option.
  */
-#define THUMBNAIL_PARSER 0  // Default: 0
+#define THUMBNAIL_PARSER 1  // Default: 0
 
 //===========================================================================
 //=========================== Other Settings ================================
