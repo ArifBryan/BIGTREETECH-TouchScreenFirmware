@@ -254,11 +254,19 @@ void hostActionCommands(void)
 
       if (!ack_seen("Ready."))  // avoid to display unneeded/frequent useless notifications (e.g. "My printer Ready.")
       {
+        // MYEDIT : Use custom dialog style on returned message.
+        DIALOG_TYPE type = DIALOG_TYPE_INFO;
+
+        if(ack_seen("Settings Stored"))
+          type = DIALOG_TYPE_SUCCESS;
+        else if(ack_seen("Home") && ack_seen("First"))
+          type = DIALOG_TYPE_ERROR;
+
         if (infoMenu.menu[infoMenu.cur] != menuStatus)  // don't show it when in menuStatus
-          addToast(DIALOG_TYPE_INFO, dmaL2Cache + index);
+          addToast(type, dmaL2Cache + index);
 
         if (infoSettings.notification_m117 == ENABLED)
-          addNotification(DIALOG_TYPE_INFO, (char *)echomagic, (char *)dmaL2Cache + index, false);
+          addNotification(type, (char *)echomagic, (char *)dmaL2Cache + index, false);
       }
     }
   }
