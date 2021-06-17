@@ -150,6 +150,13 @@ void loopVolumeSource(void)
                                                     {LABEL_U_DISK_REMOVED, LABEL_U_DISK_INSERTED}};
       volumeSrcStatus[i] = (*volumeInserted[i])();
       volumeReminderMessage(labelSDStates[i][volumeSrcStatus[i]], STATUS_NORMAL);
+      // MYEDIT : Play sound when volume inserted and removed.
+      if(volumeSrcStatus[i]){
+        BUZZER_PLAY(sound_ok);
+      }
+      else{
+        BUZZER_PLAY(sound_cancel);
+      }
     }
   }
 }
