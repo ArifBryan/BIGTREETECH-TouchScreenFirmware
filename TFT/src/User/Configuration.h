@@ -185,7 +185,7 @@
 
 #define HEAT_MAX_TEMP   {275,       275,       275,       275,       275,       275,       150,    60}
 #define HEAT_SIGN_ID    {"T0:",     "T1:",     "T2:",     "T3:",     "T4:",     "T5:",     "B:",   "C:"}
-#define HEAT_DISPLAY_ID {"T0",      "T1",      "T2",      "T3",      "T4",      "T5",      "Bed",  "Chamber"}
+#define HEAT_DISPLAY_ID {"Tip",      "T1",      "T2",      "T3",      "T4",      "T5",      "Bed",  "Chamber"}
 #define HEAT_CMD        {"M104 T0", "M104 T1", "M104 T2", "M104 T3", "M104 T4", "M104 T5", "M140", "M141"}
 #define HEAT_WAIT_CMD   {"M109 T0", "M109 T1", "M109 T2", "M109 T3", "M109 T4", "M109 T5", "M190", "M191"}
 
@@ -201,7 +201,7 @@
  * Controller fan have two speed (Active and Idle) index 6 and 7.
  */
 #define FAN_MAX_PWM    {255,  255,  255,  255,  255,  255,  255,   255}
-#define FAN_DISPLAY_ID {"F0 ", "F1 ", "F2 ", "F3 ", "F4 ", "F5 ", "CtS", "CtI"}
+#define FAN_DISPLAY_ID {"Fan", "F1 ", "F2 ", "F3 ", "F4 ", "F5 ", "CtS", "CtI"}
 #define FAN_CMD        {"M106 P0 S%d\n", "M106 P1 S%d\n", "M106 P2 S%d\n", "M106 P3 S%d\n", "M106 P4 S%d\n", "M106 P5 S%d\n", \
                         "M710 S%d\n",    "M710 I%d\n" }
 
@@ -223,9 +223,9 @@
 #define SPEED_Z_FAST   2000
 
 // Extrude speed (mm/min)
-#define EXTRUDE_SLOW_SPEED     60
-#define EXTRUDE_NORMAL_SPEED  600
-#define EXTRUDE_FAST_SPEED   1200
+#define EXTRUDE_SLOW_SPEED     50
+#define EXTRUDE_NORMAL_SPEED  500
+#define EXTRUDE_FAST_SPEED   1000
 
 // Size of machine
 #define X_MIN_POS   0
@@ -241,7 +241,7 @@
  *
  * WARNING: It MUST be negative (e.g. -50mm) for a Delta printer to avoid crashing into the top of the tower.
  */
-#define PROBING_Z_RAISE 20.0f
+#define PROBING_Z_RAISE 5.0f
 
 // Pause Settings
 #define NOZZLE_PAUSE_RETRACT_LENGTH               15  // (mm)
@@ -419,8 +419,8 @@
  *          6: 50 Percent,   7: 60 Percent,   8: 70 Percent,
  *          9: 80 Percent,  10: 90 Percent,  11: 100 Percent
  */
-#define DEFAULT_LCD_BRIGHTNESS       3  // Default: 11
-#define DEFAULT_LCD_IDLE_BRIGHTNESS  2  // Default: 3
+#define DEFAULT_LCD_BRIGHTNESS       2  // Default: 11
+#define DEFAULT_LCD_IDLE_BRIGHTNESS  1  // Default: 3
 
 /**
  * Idle LCD diming Timer (TFT28 V3.0, TFT35 E3.0, TFT43 V3.0, TFT50 V3.0 & TFT70 V3.0)
@@ -431,7 +431,7 @@
  *          3: 30 Seconds,   4: 60 Seconds,     5: 120 Seconds,
  *          6: 300 Seconds,  7: CUSTOM Seconds
  */
-#define DEFAULT_LCD_IDLE_TIMER  5  // Default: 0
+#define DEFAULT_LCD_IDLE_TIMER  6  // Default: 0
 #define LCD_DIM_CUSTOM_SECONDS (10 * 60)  // Custom value in seconds. This will be used if DEFAULT_LCD_IDLE_TIMER
                                           // is set to 7 (CUSTOM Seconds).
 
@@ -552,7 +552,7 @@
  *
  * Options: [0: classic, 1: RGB565 bitmap, 2: Base64 PNG]
  *  classic: RGB565 bitmaps for all possible thumbnail sizes are embedded
- *    in the gcode file at fixed file offsets. It is fastest to parse but least flexible.
+ *   in the gcode file at fixed file offsets. It is fastest to parse but least flexible.
  *  RGB565 bitmap:
  *    A specific thumbnail comment identifies the location of a  single 'classic'
  *    embedded RB565 bitmap thumbnail. It is almost as fast as classic and
@@ -589,24 +589,9 @@
  */
 #define AUTO_SHUT_DOWN_MAXTEMP 50
 
-/**
- * Filament Runout Settings (if connected to TFT controller only)
- *
- * Select the type of filament/runout sensor and its default enabled/disabled state.
- *
- * NOTE: If the sensor is connected to the board, then this must be set to 0 (Disabled) or 'OFF' in
- *       the TFT Display. It is recommended to add a M75 code to the 'start_gcode' option and add a
- *       M77 code to the 'end_gcode' and enable both in config.ini file.
- *
- *       Example (in config.ini):
- *         end_gcode_enabled:1
- *         start_gcode_enabled:1
- *         start_gcode:M75\n
- *         end_gcode:M77\n
- *
- * Options: [0: Normal Disabled, 1: Normal Enabled, 2: Smart Disabled, 3: Smart Enabled]
-*/
-#define FIL_SENSOR_TYPE 0
+//
+// Filament Runout Settings (if connected to TFT controller)
+//
 
 // Filament runout detection
 #define FIL_RUNOUT_INVERTING true  // Set to false to invert the logic of the sensor. (Default: true)
