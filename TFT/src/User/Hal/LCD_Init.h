@@ -54,7 +54,8 @@ extern "C" {
   void loopDimTimer(void);
   void _wakeLCD(void);
 
-  #define Set_LCD_Brightness(percentage) TIM_PWM_SetDutyCycle(LCD_LED_PWM_CHANNEL, percentage)
+  // MYEDIT : Lower LCD brightness.
+  #define Set_LCD_Brightness(percentage) TIM_PWM_SetDutyCycle(LCD_LED_PWM_CHANNEL, (percentage / 2))
   #define wakeLCD() _wakeLCD()
 #else
   #define wakeLCD()
