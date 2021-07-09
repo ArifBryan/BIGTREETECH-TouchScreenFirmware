@@ -101,6 +101,8 @@ void gocdeListDraw(LISTITEM * item, uint16_t index, uint8_t itemPos)
 void startPrint(void)
 {
   infoMenu.menu[++infoMenu.cur] = menuBeforePrinting;
+  // MYEDIT : Turn on LED.
+  ledSendValue(&ledValue);
 }
 
 // open selected file/folder

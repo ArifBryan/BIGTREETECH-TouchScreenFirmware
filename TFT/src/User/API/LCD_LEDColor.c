@@ -52,7 +52,8 @@ void knob_LED_DeInit(void)
 #define NEOPIXEL_T0H_US 0.35  // Neopixel code 0 high level hold time in us
 #define NEOPIXEL_T1H_US 2.15  // Neopixel code 1 high level hold time in us
 
-void WS2812_Send_DAT(uint32_t ws2812_dat)
+// MYEDIT : Add individual pixel control.
+void WS2812_Send_mDAT(uint32_t ws2812_dat[4])
 {
   uint16_t led_num;
   int8_t bit;
@@ -69,7 +70,7 @@ void WS2812_Send_DAT(uint32_t ws2812_dat)
     {
       TIM6->CNT = 0;
       WS2812_FAST_WRITE_HIGH();  // WS2812 required very high speed, so "GPIO_SetLevel(LED_COLOR_PIN, 1)" not applicable
-      if (ws2812_dat & (1 << bit))
+      if (ws2812_dat[led_num] & (1 << bit))
       {
         while (TIM6->CNT < code_1_tim_h_cnt);
       } 
@@ -84,6 +85,28 @@ void WS2812_Send_DAT(uint32_t ws2812_dat)
   }
   TIM6->CR1 &= ~0x01;
   __enable_irq();  // Enable interrupt
+}
+
+// MYEDIT : Add individual pixel control.
+uint8_t _knobLED_Rotation = 3;
+void knob_LED_Rotate(uint32_t ws2812_dat)
+{
+  uint32_t data[4] = {0, 0, 0, 0};
+
+  data[_knobLED_Rotation] = ws2812_dat;
+  _knobLED_Rotation = (_knobLED_Rotation <= 0 ? infoSettings.neopixel_pixels - 1 : _knobLED_Rotation - 1);
+
+  WS2812_Send_mDAT(data);
+}
+
+// MYEDIT : Add individual pixel control.
+void WS2812_Send_DAT(uint32_t ws2812_dat)
+{
+  uint32_t data[4];
+
+  for(uint8_t i = 0; i < 4; i ++){data[i] = ws2812_dat;}
+
+  WS2812_Send_mDAT(data);
 }
 
 #endif

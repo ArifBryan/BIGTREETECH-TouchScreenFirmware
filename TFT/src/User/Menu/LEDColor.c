@@ -6,17 +6,17 @@
 #define LED_MIN_VALUE   0
 #define LED_MAX_VALUE   255
 
-// data structures
-#define LED_VECT_SIZE 6
+// // data structures
+// #define LED_VECT_SIZE 6
 
-// LED color components vector:
-// R: red
-// G: green
-// B: blue
-// W: white;     NEOPIXEL or RGB(W)
-// P: intensity; NEOPIXEL
-// I: index;     NEOPIXEL
-typedef uint8_t LED_VECT[LED_VECT_SIZE];
+// // LED color components vector:
+// // R: red
+// // G: green
+// // B: blue
+// // W: white;     NEOPIXEL or RGB(W)
+// // P: intensity; NEOPIXEL
+// // I: index;     NEOPIXEL
+// typedef uint8_t LED_VECT[LED_VECT_SIZE];
 
 // key button enumeration
 typedef enum
@@ -146,13 +146,15 @@ const char *const ledKeyString[2] = {
 
 const char * const ledString[LED_VECT_SIZE] = {"R", "G", "B", "W", "P", "I"};
 
-const LED_VECT ledRed =   {0xFF, 0x00, 0x00, 0x00, 0xFF, 0xFF};
-const LED_VECT ledGreen = {0x00, 0xFF, 0x00, 0x00, 0xFF, 0xFF};
-const LED_VECT ledBlue =  {0x00, 0x00, 0xFF, 0x00, 0xFF, 0xFF};
-const LED_VECT ledWhite = {0xFF, 0xFF, 0xFF, 0x00, 0xFF, 0xFF};
+const LED_VECT ledRed =   {0xFF, 0x00, 0x00, 0x00, 130, 0xFF};
+const LED_VECT ledGreen = {0x00, 0xFF, 0x00, 0x00, 130, 0xFF};
+const LED_VECT ledBlue =  {0x00, 0x00, 0xFF, 0x00, 130, 0xFF};
+const LED_VECT ledWhite = {0xFF, 0xFF, 0xFF, 0x00, 130, 0xFF};
 const LED_VECT ledOff =   {0x00, 0x00, 0x00, 0x00, 0x00, 0xFF};
 
-LED_VECT ledValue = {0x00, 0x00, 0x00, 0x00, 0xFF, 0xFF};
+// MYEDIT : Add default white LED color.
+LED_VECT ledValue = {0xFF, 0xFF, 0xFF, 0x00, 127, 0xFF};
+//LED_VECT ledValue = {0x00, 0x00, 0x00, 0x00, 0xFF, 0xFF};
 
 uint8_t ledPage = 0;
 uint8_t ledIndex = 0;

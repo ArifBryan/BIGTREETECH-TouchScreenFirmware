@@ -400,6 +400,8 @@ void drawPrintInfo(void)
 void stopConfirm(void)
 {
   printAbort();
+  // MYEDIT : Restore knob LED color.
+  WS2812_Send_DAT(led_color[infoSettings.knob_led_color]);
   infoMenu.cur--;
 }
 
@@ -551,6 +553,10 @@ void menuPrinting(void)
       {
         time = getPrintTime();
         RAPID_SERIAL_LOOP();  // perform backend printing loop before drawing to avoid printer idling
+        // MYEDIT : Add knob LED animation.
+        if(isPrinting()){
+          knob_LED_Rotate(LED_GREEN);
+        }
         if (progDisplayType == ELAPSED_REMAINING)
         {
           reDrawPrintingValue(TIM_ICON_POS, PRINT_TOP_ROW | PRINT_BOTTOM_ROW);
@@ -670,6 +676,10 @@ void menuPrinting(void)
             clearInfoPrint();
             clearInfoFile();
             infoMenu.cur = 0;
+            // MYEDIT : Turn off LED.
+            ledSendValue(&ledOff);
+            // MYEDIT : Restore knob LED color.
+            WS2812_Send_DAT(led_color[infoSettings.knob_led_color]);
           }
         #endif
         break;
@@ -703,6 +713,10 @@ void menuPrinting(void)
         {
           clearInfoPrint();
           infoMenu.cur--;
+          // MYEDIT : Turn off LED.
+          ledSendValue(&ledOff);
+          // MYEDIT : Restore knob LED color.
+          WS2812_Send_DAT(led_color[infoSettings.knob_led_color]);
         }
         break;
 

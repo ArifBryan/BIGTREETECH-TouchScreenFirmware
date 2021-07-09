@@ -170,6 +170,7 @@ extern "C" {
   void knob_LED_Init(void);
   void knob_LED_DeInit(void);
   void WS2812_Send_DAT(uint32_t ws2812_dat);
+  void knob_LED_Rotate(uint32_t ws2812_dat);
 #endif
 
 #ifdef __cplusplus

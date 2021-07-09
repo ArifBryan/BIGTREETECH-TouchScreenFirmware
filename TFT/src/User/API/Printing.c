@@ -400,8 +400,12 @@ void printEnd(void)
 
 void printComplete(void)
 {
-  BUZZER_PLAY(sound_success);
   printEnd();
+  // MYEDIT : Change LED color when completed.
+  ledSendValue(&ledGreen);
+  // MYEDIT : Change knob LED color when completed.
+  WS2812_Send_DAT(LED_GREEN);
+  BUZZER_PLAY(sound_success);
 
   if (infoSettings.auto_off)  // Auto shut down after print
   {
