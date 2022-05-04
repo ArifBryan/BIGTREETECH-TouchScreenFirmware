@@ -6,18 +6,6 @@
 #define LED_MIN_VALUE   0
 #define LED_MAX_VALUE   255
 
-// // data structures
-// #define LED_VECT_SIZE 6
-
-// // LED color components vector:
-// // R: red
-// // G: green
-// // B: blue
-// // W: white;     NEOPIXEL or RGB(W)
-// // P: intensity; NEOPIXEL
-// // I: index;     NEOPIXEL
-// typedef uint8_t LED_VECT[LED_VECT_SIZE];
-
 // key button enumeration
 typedef enum
 {
@@ -28,19 +16,10 @@ typedef enum
   LED_KEY_CANCEL,
   LED_KEY_OK,
   // no need to declare key numbers if no special task is performed by the key
+  LED_KEY_INCREASE = KEY_INCREASE,
+  LED_KEY_DECREASE = KEY_DECREASE,
   LED_KEY_IDLE = IDLE_TOUCH,
 } LED_KEY_VALUES;
-
-// colors
-#define KB_FONT_COLOR     infoSettings.font_color
-#undef KB_BG_COLOR
-#define KB_BG_COLOR       infoSettings.bg_color
-#define KB_BORDER_COLOR   infoSettings.list_border_color
-#define KB_BORDER_COLOR_2 0x4b0d
-
-#define CTRL_FONT_COLOR   WHITE
-#define CTRL_BG_COLOR     0x2174
-#define CTRL_BORDER_COLOR 0x4b0d
 
 // layout sizes
 #define KB_ROW_NUM   4
@@ -50,7 +29,7 @@ typedef enum
 #define ROW_NUM      (KB_ROW_NUM + 1)                                      // keyboard rows + control bar
 #define ROW_HEIGHT   (LCD_HEIGHT / ROW_NUM)                                // button height
 #define PAGE_ITEMS   3
-#define PAGE_NUM     (LED_VECT_SIZE / PAGE_ITEMS)
+#define PAGE_NUM     (LED_COLOR_COMPONENT_COUNT / PAGE_ITEMS)
 
 // keyboard key sizes
 #define KB_WIDTH  (LCD_WIDTH / KB_COL_NUM)
@@ -146,39 +125,11 @@ const char *const ledKeyString[2] = {
   ">",  // NEXT
 };
 
-const char * const ledString[LED_VECT_SIZE] = {"R", "G", "B", "W", "P", "I"};
-
-const LED_VECT ledRed =   {0xFF, 0x00, 0x00, 0x00, 130, 0xFF};
-const LED_VECT ledGreen = {0x00, 0xFF, 0x00, 0x00, 130, 0xFF};
-const LED_VECT ledBlue =  {0x00, 0x00, 0xFF, 0x00, 130, 0xFF};
-const LED_VECT ledWhite = {0xFF, 0xFF, 0xFF, 0x00, 130, 0xFF};
-const LED_VECT ledOff =   {0x00, 0x00, 0x00, 0x00, 0x00, 0xFF};
-
-// MYEDIT : Add default white LED color.
-LED_VECT ledValue = {0xFF, 0xFF, 0xFF, 0x00, 127, 0xFF};
-//LED_VECT ledValue = {0x00, 0x00, 0x00, 0x00, 0xFF, 0xFF};
+const char * const ledString[LED_COLOR_COMPONENT_COUNT] = {"R", "G", "B", "W", "P", "I"};
 
 uint8_t ledPage = 0;
 uint8_t ledIndex = 0;
-
-void ledSendValue(const LED_VECT * led)
-{
-  storeCmd("M150 R%d U%d B%d W%d P%d I%d\n", (*led)[0], (*led)[1], (*led)[2], (*led)[3], (*led)[4], (*led)[5]);
-}
-
-void ledGetValue(LED_VECT * led)
-{
-  for (int i = 0; i < LED_VECT_SIZE; i++)
-    (*led)[i] = ledValue[i];
-}
-
-void ledSetValue(const LED_VECT * led, bool skipNeopixel)
-{
-  int size = skipNeopixel ? LED_VECT_SIZE - 3 : LED_VECT_SIZE;
-
-  for (int i = 0; i < size; i++)
-    ledValue[i] = (*led)[i];
-}
+SETTINGS * nowInfoSettings = NULL;
 
 uint8_t ledGetComponentIndex(uint8_t index)
 {
@@ -187,21 +138,21 @@ uint8_t ledGetComponentIndex(uint8_t index)
 
 static inline uint8_t ledGetComponentValue(uint8_t index)
 {
-  return ledValue[ledGetComponentIndex(index)];
+  return ledColor[ledGetComponentIndex(index)];
 }
 
 static inline uint8_t ledEditComponentValue(uint8_t index)
 {
   uint8_t realIndex = ledGetComponentIndex(index);
 
-  return ledValue[realIndex] = editIntValue(LED_MIN_VALUE, LED_MAX_VALUE, ledValue[realIndex], ledValue[realIndex]);
+  return ledColor[realIndex] = editIntValue(LED_MIN_VALUE, LED_MAX_VALUE, ledColor[realIndex], ledColor[realIndex]);
 }
 
 uint8_t ledUpdateComponentValue(uint8_t index, int8_t unit, int8_t direction)
 {
   uint8_t realIndex = ledGetComponentIndex(index);
 
-  return ledValue[realIndex] = NOBEYOND(LED_MIN_VALUE, ledValue[realIndex] + (int16_t) (direction * unit), LED_MAX_VALUE);
+  return ledColor[realIndex] = NOBEYOND(LED_MIN_VALUE, ledColor[realIndex] + (int16_t) (direction * unit), LED_MAX_VALUE);
 }
 
 uint8_t ledGetControlIndex(uint8_t keyNum)
@@ -214,21 +165,13 @@ uint8_t ledGetControlSubIndex(uint8_t keyNum)
   return (keyNum - (LED_KEY_OK + 1)) % 4;
 }
 
-uint16_t ledGetRGBColor(LED_VECT * led)
-{
-  uint8_t r = (*led)[0] >> 3;
-  uint8_t g = (*led)[1] >> 2;
-  uint8_t b = (*led)[2] >> 3;
-  return ((r & 0x001F) << 11) | ((g & 0x003F) << 5) | ((b & 0x001F));  // RGB color in RGB 565 16 bit format
-}
-
 uint16_t ledGetComponentRGBColor(uint8_t component, uint8_t index)
 {
-  LED_VECT led = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00};  // component RGB color in RGB 565 16 bit format
+  LED_COLOR led = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00};  // component RGB color in RGB 565 16 bit format
 
   led[index] = component;
 
-  return ledGetRGBColor(&led);
+  return LED_GetRGBColor(&led);
 }
 
 static inline void ledDrawPageNumber(void)
@@ -237,7 +180,7 @@ static inline void ledDrawPageNumber(void)
 
   sprintf(tempstr, "%d/%d", ledPage + 1, PAGE_NUM);
 
-  drawStandardValue(&ledPageRect, VALUE_STRING, &tempstr, FONT_SIZE_LARGE, CTRL_FONT_COLOR, CTRL_BG_COLOR, 1, true);
+  drawStandardValue(&ledPageRect, VALUE_STRING, &tempstr, FONT_SIZE_LARGE, LC_CTRL_FONT_COLOR, LC_CTRL_BG_COLOR, 1, true);
 }
 
 void ledDrawControl(uint8_t index, bool isFocused, bool drawFocus, bool drawAll)
@@ -256,32 +199,32 @@ void ledDrawControl(uint8_t index, bool isFocused, bool drawFocus, bool drawAll)
     rect.x1 = rect2.x0 = (rect.x0 + rect.x1) / 2;
   #endif
 
-  bgColorFocus = isFocused ? KB_BORDER_COLOR : KB_BG_COLOR;
+  bgColorFocus = isFocused ? LC_KB_BORDER_COLOR : LC_KB_BG_COLOR;
 
   // draw focus border
   if (drawFocus)
     drawBorder(&ledKeyRect[i], bgColorFocus, 2);
 
   // draw LED component string
-  drawStandardValue(&rect, VALUE_STRING, ledString[realIndex], FONT_SIZE_LARGE, KB_FONT_COLOR, bgColorFocus, 3, drawFocus);
+  drawStandardValue(&rect, VALUE_STRING, ledString[realIndex], FONT_SIZE_LARGE, LC_KB_FONT_COLOR, bgColorFocus, 3, drawFocus);
 
   // draw LED component RGB color
-  drawStandardValue(&rect2, VALUE_NONE, NULL, FONT_SIZE_LARGE, KB_FONT_COLOR, ledGetComponentRGBColor(ledValue[realIndex], realIndex), 3, true);
+  drawStandardValue(&rect2, VALUE_NONE, NULL, FONT_SIZE_LARGE, LC_KB_FONT_COLOR, ledGetComponentRGBColor(ledColor[realIndex], realIndex), 3, true);
 
   // draw LED component value
-  drawStandardValue(&ledKeyRect[j], VALUE_BYTE, &ledValue[realIndex], FONT_SIZE_LARGE, KB_FONT_COLOR, KB_BORDER_COLOR, 4, true);
+  drawStandardValue(&ledKeyRect[j], VALUE_BYTE, &ledColor[realIndex], FONT_SIZE_LARGE, LC_KB_FONT_COLOR, LC_KB_BORDER_COLOR, 4, true);
 
   if (drawAll)
   {
     // draw LED component value area borders (outer)
-    drawBorder(&ledKeyRect[j], KB_BORDER_COLOR, 2);
+    drawBorder(&ledKeyRect[j], LC_KB_BORDER_COLOR, 2);
 
     // draw LED component value area borders (inner)
-    drawBorder(&ledKeyRect[j], KB_BORDER_COLOR_2, 3);
+    drawBorder(&ledKeyRect[j], LC_KB_BORDER_COLOR_2, 3);
 
     // draw buttons
-    drawStandardValue(&ledKeyRect[j + 1], VALUE_STRING, ledKeyString[LED_KEY_PREV], FONT_SIZE_LARGE, KB_FONT_COLOR, KB_BG_COLOR, 3, true);
-    drawStandardValue(&ledKeyRect[j + 2], VALUE_STRING, ledKeyString[LED_KEY_NEXT], FONT_SIZE_LARGE, KB_FONT_COLOR, KB_BG_COLOR, 3, true);
+    drawStandardValue(&ledKeyRect[j + 1], VALUE_STRING, ledKeyString[LED_KEY_PREV], FONT_SIZE_LARGE, LC_KB_FONT_COLOR, LC_KB_BG_COLOR, 3, true);
+    drawStandardValue(&ledKeyRect[j + 2], VALUE_STRING, ledKeyString[LED_KEY_NEXT], FONT_SIZE_LARGE, LC_KB_FONT_COLOR, LC_KB_BG_COLOR, 3, true);
   }
 }
 
@@ -293,23 +236,23 @@ void ledDrawButton(uint8_t index, uint8_t isPressed)
   if (isPressed)
   {
     if (index <= LED_KEY_NEXT)
-      drawStandardValue(&ledKeyRect[index], VALUE_STRING, ledKeyString[index], FONT_SIZE_LARGE, CTRL_BG_COLOR, CTRL_FONT_COLOR, 1, true);
+      drawStandardValue(&ledKeyRect[index], VALUE_STRING, ledKeyString[index], FONT_SIZE_LARGE, LC_CTRL_BG_COLOR, LC_CTRL_FONT_COLOR, 1, true);
     else
-      drawBorder(&ledKeyRect[index], KB_FONT_COLOR, 1);
+      drawBorder(&ledKeyRect[index], LC_KB_FONT_COLOR, 1);
   }
   else
   {
     if (index <= LED_KEY_NEXT)
-      drawStandardValue(&ledKeyRect[index], VALUE_STRING, ledKeyString[index], FONT_SIZE_LARGE, CTRL_FONT_COLOR, CTRL_BG_COLOR, 1, true);
+      drawStandardValue(&ledKeyRect[index], VALUE_STRING, ledKeyString[index], FONT_SIZE_LARGE, LC_CTRL_FONT_COLOR, LC_CTRL_BG_COLOR, 1, true);
     else
-      drawBorder(&ledKeyRect[index], KB_BG_COLOR, 1);
+      drawBorder(&ledKeyRect[index], LC_KB_BG_COLOR, 1);
   }
 }
 
 void ledDrawKeyboard(void)
 {
   // draw horizontal button borders
-  GUI_SetColor(KB_BORDER_COLOR);
+  GUI_SetColor(LC_KB_BORDER_COLOR);
 
   for (int i = 1; i < (KB_ROW_NUM); i++)
   {
@@ -341,7 +284,7 @@ void ledDrawKeyboard(void)
   ledDrawControl(ledIndex, true, true, false);
 
   // draw RGB color
-  drawStandardValue(&ledColorRect, VALUE_NONE, NULL, FONT_SIZE_LARGE, KB_FONT_COLOR, ledGetRGBColor(&ledValue), 3, true);
+  drawStandardValue(&ledColorRect, VALUE_NONE, NULL, FONT_SIZE_LARGE, LC_KB_FONT_COLOR, LED_GetRGBColor(&ledColor), 3, true);
 
   // draw page number
   ledDrawPageNumber();
@@ -355,19 +298,19 @@ void ledDrawMenu(void)
   setMenu(MENU_TYPE_FULLSCREEN, NULL, COUNT(ledKeyRect), ledKeyRect, ledDrawButton, &ledDrawMenu);
 
   // clear keyboard area
-  GUI_SetBkColor(KB_BG_COLOR);
+  GUI_SetBkColor(LC_KB_BG_COLOR);
   GUI_ClearPrect(&ledAreaRect[0]);
 
   // clear control bar area
-  GUI_SetBkColor(CTRL_BG_COLOR);
+  GUI_SetBkColor(LC_CTRL_BG_COLOR);
   GUI_ClearPrect(&ledAreaRect[1]);
 
   // draw control bar area shadow border
-  GUI_SetColor(CTRL_BORDER_COLOR);
+  GUI_SetColor(LC_CTRL_BORDER_COLOR);
   GUI_HLine(ledAreaRect[1].x0, ledAreaRect[1].y0, ledAreaRect[1].x1);  // first row of control bar used for shadow border
 
   // draw RGB color border
-  drawBorder(&ledColorRect, KB_BORDER_COLOR, 2);
+  drawBorder(&ledColorRect, LC_KB_BORDER_COLOR, 2);
 
   // draw keyboard
   ledDrawKeyboard();
@@ -376,23 +319,19 @@ void ledDrawMenu(void)
 void menuLEDColorCustom(void)
 {
   LED_KEY_VALUES key_num = LED_KEY_IDLE;
-  LED_VECT origLedValue;
+  LED_COLOR origLedColor;
   uint8_t newIndex;
-  uint16_t newValue, curValue;
+  uint8_t newValue, curValue;
   bool updateForced, sendingNeeded;
 
-  ledGetValue(&origLedValue);  // get initial LED color components vector
+  LED_GetColor(&origLedColor);  // get initial LED color components array
   newIndex = ledIndex;
   newValue = curValue = ledGetComponentValue(newIndex);
   updateForced = sendingNeeded = false;
 
   ledDrawMenu();
 
-  #if LCD_ENCODER_SUPPORT
-    encoderPosition = 0;
-  #endif
-
-  while (infoMenu.menu[infoMenu.cur] == menuLEDColorCustom)
+  while (MENU_IS(menuLEDColorCustom))
   {
     key_num = menuKeyGetValue();
     switch (key_num)
@@ -402,7 +341,6 @@ void menuLEDColorCustom(void)
         if (ledPage > 0)
         {
           ledPage--;
-
           updateForced = true;
         }
         break;
@@ -412,50 +350,54 @@ void menuLEDColorCustom(void)
         if (ledPage < (PAGE_NUM - 1))
         {
           ledPage++;
-
           updateForced = true;
         }
         break;
 
       // apply new LED color and exit
       case LED_KEY_OK:
-        ledGetValue(&origLedValue);
+        LED_GetColor(&infoSettings.led_color);  // set (neopixel) LED light configured color to current color
+
+        // needed by following reset case (restore original LED color) just to align and set the original color with the new one
+        LED_GetColor(&origLedColor);
         // no break here
 
       // restore original LED color and exit
       case LED_KEY_CANCEL:
-        infoMenu.cur--;
+        CLOSE_MENU();
         // no break here
 
       // restore original LED color
       case LED_KEY_RESET:
-        ledSetValue(&origLedValue, false);
+        LED_SetColor(&origLedColor, false);
 
         updateForced = true;
         break;
 
       // use rotary encoder to update LED component value
-      case LED_KEY_IDLE:
-        #if LCD_ENCODER_SUPPORT
-          if (encoderPosition)
-          {
-            curValue = ledUpdateComponentValue(ledIndex, 1, (encoderPosition > 0) ? 1 : -1);
+      case LED_KEY_INCREASE:
+        curValue = ledUpdateComponentValue(ledIndex, 1, 1);
+        break;
 
-            encoderPosition = 0;
-          }
-        #endif
+      case LED_KEY_DECREASE:
+        curValue = ledUpdateComponentValue(ledIndex, 1, -1);
+        break;
+
+      case LED_KEY_IDLE:
         break;
 
       default:
+      {
         ledIndex = ledGetControlIndex(key_num);  // get control index
+
+        if (newIndex != ledIndex)  // needed in case the value will be also changed (increased or decreased)
+          newValue = curValue = ledGetComponentValue(ledIndex);
 
         switch (ledGetControlSubIndex(key_num))  // get control sub index
         {
           case 1:
           {
             curValue = ledEditComponentValue(ledIndex);
-
-            sendingNeeded = true;
 
             ledDrawMenu();
             break;
@@ -475,10 +417,16 @@ void menuLEDColorCustom(void)
             break;
         }
         break;
+      }
     }
 
     if (updateForced)
+    {
       ledDrawKeyboard();  // draw all
+
+      // needed in case reset button is pressed (restore original LED color) just to align the values with the restored one
+      newValue = curValue = ledGetComponentValue(newIndex);
+    }
 
     if (newIndex != ledIndex)
     {
@@ -486,13 +434,12 @@ void menuLEDColorCustom(void)
       ledDrawControl(ledIndex, true, true, false);   // get focus and draw LED component value
 
       newIndex = ledIndex;
-      newValue = curValue = ledGetComponentValue(newIndex);  // always load the value for the new index
     }
 
     if (newValue != curValue)
     {
-      ledDrawControl(ledIndex, newIndex == ledIndex, false, false);  // draw changed LED component value
-      drawStandardValue(&ledColorRect, VALUE_NONE, NULL, FONT_SIZE_LARGE, KB_FONT_COLOR, ledGetRGBColor(&ledValue), 3, true);  // draw RGB color
+      ledDrawControl(ledIndex, true, false, false);  // draw changed LED component value
+      drawStandardValue(&ledColorRect, VALUE_NONE, NULL, FONT_SIZE_LARGE, LC_KB_FONT_COLOR, LED_GetRGBColor(&ledColor), 3, true);  // draw RGB color
 
       newValue = curValue;
       sendingNeeded = true;
@@ -500,7 +447,7 @@ void menuLEDColorCustom(void)
 
     if ((sendingNeeded && nextScreenUpdate(LED_UPDATE_TIME)) || updateForced)
     {
-      ledSendValue(&ledValue);
+      LED_SendColor(&ledColor);
 
       updateForced = sendingNeeded = false;
     }
@@ -531,46 +478,62 @@ const MENUITEMS LEDColorItems = {
 void menuLEDColor(void)
 {
   KEY_VALUES key_num = KEY_IDLE;
+  bool forceLedOff, forceExit;
+
+  if (nowInfoSettings == NULL)
+  {
+    nowInfoSettings = (SETTINGS *) malloc(sizeof(SETTINGS));
+    *nowInfoSettings = infoSettings;
+  }
+
+  LED_SetColor(&infoSettings.led_color, false);  // set (neopixel) LED light current color to configured color
+  LED_SendColor(&ledColor);                      // set (neopixel) LED light to current color
+  forceLedOff = false;
+  forceExit = false;
 
   menuDrawPage(&LEDColorItems);
 
-  while (infoMenu.menu[infoMenu.cur] == menuLEDColor)
+  while (MENU_IS(menuLEDColor))
   {
     key_num = menuKeyGetValue();
     switch (key_num)
     {
       // red
       case KEY_ICON_0:
-        ledSetValue(&ledRed, true);
+        LED_SetColor(&ledRed, true);
         break;
 
       // green
       case KEY_ICON_1:
-        ledSetValue(&ledGreen, true);
+        LED_SetColor(&ledGreen, true);
         break;
 
       // blue
       case KEY_ICON_2:
-        ledSetValue(&ledBlue, true);
+        LED_SetColor(&ledBlue, true);
         break;
 
       // white
       case KEY_ICON_3:
-        ledSetValue(&ledWhite, true);
+        LED_SetColor(&ledWhite, true);
         break;
 
       // custom LED color
       case KEY_ICON_4:
-        infoMenu.menu[++infoMenu.cur] = menuLEDColorCustom;
+        OPEN_MENU(menuLEDColorCustom);
         break;
 
-      // turn off
+      // switch off
       case KEY_ICON_6:
-        ledSendValue(&ledOff);
+        LED_SendColor(&ledOff);
+
+        forceLedOff = true;
         break;
 
       case KEY_ICON_7:
-        infoMenu.cur--;
+        CLOSE_MENU();
+
+        forceExit = true;
         break;
 
       default:
@@ -578,8 +541,25 @@ void menuLEDColor(void)
     }
 
     if (key_num <= KEY_ICON_5)  // change LED color
-      ledSendValue(&ledValue);
+    {
+      LED_SendColor(&ledColor);
+      LED_GetColor(&infoSettings.led_color);  // set (neopixel) LED light configured color to current color
+
+      forceLedOff = false;
+    }
 
     loopProcess();
+  }
+
+  if (forceExit)
+  {
+    if (memcmp(nowInfoSettings, &infoSettings, sizeof(SETTINGS)))  // if configured color is changed, save it to flash
+      storePara();
+
+    if (forceLedOff)  // if LED is switched off, set (neopixel) LED light current color to OFF
+      LED_SetColor(&ledOff, false);
+
+    free(nowInfoSettings);
+    nowInfoSettings = NULL;
   }
 }

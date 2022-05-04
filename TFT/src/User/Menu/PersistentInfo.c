@@ -8,11 +8,11 @@ bool temperatureStatusValid(void)
   if (infoHost.connected == false) return false;
   if (toastRunning()) return false;
 
-  if (infoMenu.menu[infoMenu.cur] == menuPrinting) return false;
-  if (infoMenu.menu[infoMenu.cur] == menuStatus) return false;
-  if (infoMenu.menu[infoMenu.cur] == menuMove) return false;
-  if (infoMenu.menu[infoMenu.cur] == menuInfo) return false;
-  if (infoMenu.menu[infoMenu.cur] == menuNotification) return false;
+  if (MENU_IS(menuPrinting)) return false;
+  if (MENU_IS(menuStatus)) return false;
+  if (MENU_IS(menuMove)) return false;
+  if (MENU_IS(menuInfo)) return false;
+  if (MENU_IS(menuNotification)) return false;
 
   return true;
 }
@@ -52,7 +52,7 @@ void loopTemperatureStatus(void)
     }
   }
 
-  if (update) menuReDrawCurTitle();
+  if (update) menuDrawTitle();
 }
 
 // draw temperature status on title bar

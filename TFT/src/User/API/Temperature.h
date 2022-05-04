@@ -12,7 +12,7 @@ extern "C" {
 #define TEMPERATURE_QUERY_FAST_SECONDS 1  // "M105" temperature query delay in heat menu or while heating.
 #define TEMPERATURE_QUERY_SLOW_SECONDS 3  // temperature query delay when idle
 #define TEMPERATURE_RANGE              2  // temperature difference to treat temperature reached target
-#define NOZZLE_TEMP_LAG                5  // nozzle max allowed lag 
+#define NOZZLE_TEMP_LAG                5  // nozzle max allowed lag
 
 typedef enum
 {
@@ -66,6 +66,7 @@ typedef struct
 
 extern const char *const heaterID[];
 extern const char *const heatDisplayID[];
+extern const char *const heatShortID[];
 extern const char *const heatCmd[];
 extern const char *const heatWaitCmd[];
 
@@ -76,17 +77,16 @@ void heatSetCurrentTemp(uint8_t index, int16_t temp);
 int16_t heatGetCurrentTemp(uint8_t index);
 void heatCoolDown(void);
 
-void heatSetCurrentTool(uint8_t tool);
-uint8_t heatGetCurrentTool(void);
-uint8_t heatGetCurrentHotend(void);
-bool heaterDisplayIsValid(uint8_t index);
-
 bool heatGetIsWaiting(uint8_t index);
 bool heatHasWaiting(void);
 void heatSetIsWaiting(uint8_t index, HEATER_WAIT isWaiting);
 void heatClearIsWaiting(void);
 
-void updateNextHeatCheckTime(void);
+void heatSetCurrentTool(uint8_t tool);
+uint8_t heatGetCurrentTool(void);
+uint8_t heatGetCurrentHotend(void);
+bool heaterDisplayIsValid(uint8_t index);
+
 void heatSetUpdateSeconds(uint8_t seconds);
 uint8_t heatGetUpdateSeconds(void);
 void heatSyncUpdateSeconds(uint8_t seconds);
@@ -94,6 +94,7 @@ void heatSetUpdateWaiting(bool isWaiting);
 void heatSetSendWaiting(uint8_t index, bool isWaiting);
 bool heatGetSendWaiting(uint8_t index);
 
+void updateNextHeatCheckTime(void);
 void loopCheckHeater(void);
 
 #ifdef __cplusplus

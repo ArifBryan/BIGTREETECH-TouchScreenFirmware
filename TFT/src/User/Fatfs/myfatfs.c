@@ -1,5 +1,5 @@
 #include "myfatfs.h"
-#include "includes.h"
+#include "includes.h"  // for infoSettings etc...
 #include "diskio.h"
 
 FATFS fatfs[FF_VOLUMES];  // FATFS work area
@@ -12,7 +12,7 @@ FATFS fatfs[FF_VOLUMES];  // FATFS work area
  * @param name2 name of second file/folder
  * @param date2 date/time for second file/folder
  */
-bool compareFile(char * name1, int32_t date1, char * name2, int32_t date2)
+bool compareFile(char * name1, uint32_t date1, char * name2, uint32_t date2)
 {
   // sort by date
   if (infoSettings.files_sort_by <= SORT_DATE_OLD_FIRST)
@@ -40,40 +40,42 @@ bool compareFile(char * name1, int32_t date1, char * name2, int32_t date2)
   }
 }
 
-/*
- mount SD Card from Fatfs
- true: mount ok
- false: mount failed
-*/
+/**
+ * mount SD card from Fatfs
+ * true: mount ok
+ * false: mount failed
+ */
 bool mountSDCard(void)
 {
-  return (f_mount(&fatfs[VOLUMES_SD_CARD], "SD:", 1) == FR_OK);
+  return (f_mount(&fatfs[VOLUMES_SD_CARD], SD_ROOT_DIR, 1) == FR_OK);
 }
 
-/*
- mount U disk from Fatfs
-*/
-bool mountUDisk(void)
+/**
+ * mount USB disk from Fatfs
+ * true: mount ok
+ * false: mount failed
+ */
+bool mountUSBDisk(void)
 {
-  return (f_mount(&fatfs[VOLUMES_U_DISK], "U:", 1) == FR_OK);
+  return (f_mount(&fatfs[VOLUMES_USB_DISK], USB_ROOT_DIR, 1) == FR_OK);
 }
 
-/*
- scanf gcode file in current path
- true: scanf ok
- false: opendir failed
-*/
+/**
+ * scanf gcode file in current path
+ * true: scanf ok
+ * false: opendir failed
+ */
 bool scanPrintFilesFatFs(void)
 {
   FILINFO finfo;
   uint16_t len = 0;
   DIR dir;
-  int32_t folderDate[FILE_NUM];
-  int32_t fileDate[FILE_NUM];
+  uint32_t folderDate[FILE_NUM];
+  uint32_t fileDate[FILE_NUM];
 
   clearInfoFile();
 
-  if (f_opendir(&dir, infoFile.title) != FR_OK)
+  if (f_opendir(&dir, infoFile.path) != FR_OK)
     return false;
 
   for (;;)
@@ -86,7 +88,7 @@ bool scanPrintFilesFatFs(void)
       break;
 
     len = strlen(finfo.fname) + 1;
-    if ((finfo.fattrib & AM_DIR) == AM_DIR)
+    if ((finfo.fattrib & AM_DIR) == AM_DIR)  // if folder
     {
       if (infoFile.folderCount >= FOLDER_NUM)
         continue;
@@ -96,26 +98,31 @@ bool scanPrintFilesFatFs(void)
         break;
 
       // copy date/time modified
-      folderDate[infoFile.folderCount] = (finfo.fdate * 100000) + finfo.ftime;
+      folderDate[infoFile.folderCount] = ((uint32_t)(finfo.fdate) << 16) | finfo.ftime;
+
       // copy folder name
-      memcpy(infoFile.folder[infoFile.folderCount++], finfo.fname, len);
+      memcpy(infoFile.folder[infoFile.folderCount], finfo.fname, len);
+      infoFile.folderCount++;
     }
-    else
+    else  // if file
     {
       if (infoFile.fileCount >= FILE_NUM)
         continue;
 
-      if (strstr(finfo.fname, ".g") == NULL)  // support "*.g","*.gco" and "*.gcode"
+      if (isSupportedFile(finfo.fname) == NULL)  // if filename doesn't provide a supported filename extension
         continue;
 
-      infoFile.file[infoFile.fileCount] = malloc(len);
+      infoFile.file[infoFile.fileCount] = malloc(len + 1);  // plus one extra byte for filename extension check
       if (infoFile.file[infoFile.fileCount] == NULL)
         break;
 
       // copy date/time modified
-      fileDate[infoFile.fileCount] = (finfo.fdate * 100000) + finfo.ftime;
-      // copy file name
-      memcpy(infoFile.file[infoFile.fileCount++], finfo.fname, len);
+      fileDate[infoFile.fileCount] = ((uint32_t)(finfo.fdate) << 16) | finfo.ftime;
+
+      // copy file name and set the flag for filename extension check
+      strncpy(infoFile.file[infoFile.fileCount], finfo.fname, len + 1);  // "+ 1": the flag for filename extension check
+      infoFile.longFile[infoFile.fileCount] = NULL;                      // long filename is not supported, so always set it to NULL
+      infoFile.fileCount++;
     }
   }
 
@@ -213,14 +220,15 @@ bool Get_NewestGcode(const TCHAR* path)
         continue;
 
       date = (finfo.fdate << 16) | finfo.ftime;
+
       resetInfoFile();
 
       if (len + strlen(finfo.fname) + 2 > MAX_PATH_LEN)
         break;
 
-      strcpy(infoFile.title, path);
-      strcat(infoFile.title, "/");
-      strcat(infoFile.title, finfo.fname);
+      strcpy(infoFile.path, path);
+      strcat(infoFile.path, "/");
+      strcat(infoFile.path, finfo.fname);
       status = 1;
     }
   }
@@ -251,7 +259,7 @@ bool f_dir_exists(const TCHAR* path)
   return false;
 }
 
-FRESULT f_remove_node (
+FRESULT f_remove_node(
   TCHAR* path,   // Path name buffer with the sub-directory to delete
   UINT sz_buff,  // Size of path name buffer (items)
   FILINFO* fno   // Name read buffer

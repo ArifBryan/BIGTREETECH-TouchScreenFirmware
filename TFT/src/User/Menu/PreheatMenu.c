@@ -18,33 +18,34 @@ const ITEM itemToolPreheat[] = {
 };
 
 // Redraw Preheat icon details
-void refreshPreheatIcon(PREHEAT_STORE * preheatStore, int8_t index, const ITEM * menuitem)
+void refreshPreheatIcon(PREHEAT_STORE * preheatStore, uint8_t index, bool redrawIcon)
 {
   LIVE_INFO lvIcon;
+  lvIcon.iconIndex = ICON_PREHEAT;
   lvIcon.enabled[0] = true;
   lvIcon.enabled[1] = true;
   lvIcon.enabled[2] = true;
 
-  //set preheat title properties
+  // set preheat title properties
   lvIcon.lines[0].h_align = CENTER;
   lvIcon.lines[0].v_align = TOP;
-  lvIcon.lines[0].fn_color = WHITE;
+  lvIcon.lines[0].fn_color = PH_VAL_COLOR;
   lvIcon.lines[0].text_mode = GUI_TEXTMODE_TRANS;
   lvIcon.lines[0].pos = preheat_title;
   lvIcon.lines[0].font = FONT_SIZE_NORMAL;
 
-  //set preheat tool propertites
+  // set preheat tool propertites
   lvIcon.lines[1].h_align = RIGHT;
   lvIcon.lines[1].v_align = CENTER;
-  lvIcon.lines[1].fn_color = WHITE;
+  lvIcon.lines[1].fn_color = PH_VAL_COLOR;
   lvIcon.lines[1].text_mode = GUI_TEXTMODE_TRANS;
   lvIcon.lines[1].pos = preheat_val_tool;
   lvIcon.lines[1].font = FONT_SIZE_NORMAL;
 
-  //set preheat bed properties
+  // set preheat bed properties
   lvIcon.lines[2].h_align = RIGHT;
   lvIcon.lines[2].v_align = CENTER;
-  lvIcon.lines[2].fn_color = WHITE;
+  lvIcon.lines[2].fn_color = PH_VAL_COLOR;
   lvIcon.lines[2].text_mode = GUI_TEXTMODE_TRANS;
   lvIcon.lines[2].pos = preheat_val_bed;
   lvIcon.lines[2].font = FONT_SIZE_NORMAL;
@@ -58,7 +59,7 @@ void refreshPreheatIcon(PREHEAT_STORE * preheatStore, int8_t index, const ITEM *
   lvIcon.lines[1].text = (uint8_t *)temptool;
   lvIcon.lines[2].text = (uint8_t *)tempbed;
 
-  showLiveInfo(index, &lvIcon, menuitem);
+  showLiveInfo(index, &lvIcon, redrawIcon);
 }
 
 void menuPreheat(void)
@@ -68,12 +69,12 @@ void menuPreheat(void)
     LABEL_PREHEAT,
     // icon                          label
     {
-      {ICON_PREHEAT,                 LABEL_BACKGROUND},
-      {ICON_PREHEAT,                 LABEL_BACKGROUND},
-      {ICON_PREHEAT,                 LABEL_BACKGROUND},
-      {ICON_PREHEAT,                 LABEL_BACKGROUND},
-      {ICON_PREHEAT,                 LABEL_BACKGROUND},
-      {ICON_PREHEAT,                 LABEL_BACKGROUND},
+      {ICON_PREHEAT,                 LABEL_NULL},
+      {ICON_PREHEAT,                 LABEL_NULL},
+      {ICON_PREHEAT,                 LABEL_NULL},
+      {ICON_PREHEAT,                 LABEL_NULL},
+      {ICON_PREHEAT,                 LABEL_NULL},
+      {ICON_PREHEAT,                 LABEL_NULL},
       {ICON_PREHEAT_BOTH,            LABEL_PREHEAT_BOTH},
       {ICON_BACK,                    LABEL_BACK},
     }
@@ -90,10 +91,10 @@ void menuPreheat(void)
 
   for (int i = 0; i < PREHEAT_COUNT; i++)
   {
-    refreshPreheatIcon(&preheatStore, i, &preheatItems.items[i]);
+    refreshPreheatIcon(&preheatStore, i, false);
   }
 
-  while (infoMenu.menu[infoMenu.cur] == menuPreheat)
+  while (MENU_IS(menuPreheat))
   {
     key_num = menuKeyGetValue();
     switch (key_num)
@@ -119,7 +120,7 @@ void menuPreheat(void)
             heatSetTargetTemp(heatGetCurrentHotend(), preheatStore.preheat_temp[key_num]);
             break;
         }
-        refreshPreheatIcon(&preheatStore, key_num, &preheatItems.items[key_num]);
+        refreshPreheatIcon(&preheatStore, key_num, false);
         break;
 
       case KEY_ICON_6:
@@ -129,7 +130,7 @@ void menuPreheat(void)
         break;
 
       case KEY_ICON_7:
-        infoMenu.cur--;
+        CLOSE_MENU();
         break;
 
       default:

@@ -11,8 +11,8 @@ const MENUITEMS settingsItems = {
     {ICON_FEATURE_SETTINGS,        LABEL_FEATURE_SETTINGS},
     {ICON_SCREEN_INFO,             LABEL_SCREEN_INFO},
     {ICON_CONNECTION_SETTINGS,     LABEL_CONNECTION_SETTINGS},
-    {ICON_BACKGROUND,              LABEL_BACKGROUND},
-    {ICON_BACKGROUND,              LABEL_BACKGROUND},
+    {ICON_NULL,                    LABEL_NULL},
+    {ICON_NULL,                    LABEL_NULL},
     {ICON_BACK,                    LABEL_BACK},
   }
 };
@@ -84,8 +84,7 @@ void menuInfo(void)
 {
   char buf[128];
 
-  const char *const hardware = "BIGTREETECH_" HARDWARE_VERSION;
-  const char *const firmware = HARDWARE_VERSION"." STRINGIFY(SOFTWARE_VERSION) " " __DATE__;
+  const char *const hardware = HARDWARE_MANUFACTURER HARDWARE_VERSION;
 
   GUI_Clear(infoSettings.bg_color);
   GUI_SetColor(GRAY);
@@ -109,10 +108,6 @@ void menuInfo(void)
   // GUI_DispString(clocks[5].x, clocks[5].y, (uint8_t *)buf);
 
   // GUI_HLine(0, clocks[5].y + BYTE_HEIGHT, LCD_WIDTH);
-
-  // spi flash info
-  float usedMB = (float)FLASH_USED/1048576;
-  sprintf(buf, "Used %.2f%% (%.2fMB/%uMB)", flashUsedPercentage(), usedMB, (W25Qxx_ReadCapacity()/1048576));
 
   const uint16_t top_y = 0; //(LCD_HEIGHT - (7 * BYTE_HEIGHT)) / 2;  // 8 firmware info lines + 1 SPI flash info line
   const uint16_t start_x = strlen("Firmware:") * BYTE_WIDTH;
@@ -143,7 +138,11 @@ void menuInfo(void)
   GUI_DispStringInPrectEOL(&version[0], firmare_name);
   GUI_DispStringInPrectEOL(&version[1], machine_type);
   GUI_DispStringInPrectEOL(&version[2], (uint8_t *)hardware);
-  GUI_DispStringInPrectEOL(&version[3], (uint8_t *)firmware);
+  sprintf(buf, "V"STRINGIFY(SOFTWARE_VERSION) " " __DATE__ " in %dMhz", mcuClocks.rccClocks.SYSCLK_Frequency / 1000000);
+  GUI_DispStringInPrectEOL(&version[3], (uint8_t *)buf);
+  // spi flash info
+  float usedMB = (float)FLASH_USED/1048576;
+  sprintf(buf, "Used %.2f%% (%.2fMB/%uMB)", flashUsedPercentage(), usedMB, (W25Qxx_ReadCapacity() / 1048576));
   GUI_DispStringInPrectEOL(&version[4], (uint8_t *)buf);
   if (infoMachineSettings.firmwareType == FW_REPRAPFW)
   {
@@ -158,11 +157,11 @@ void menuInfo(void)
   GUI_DispStringInRect(20, LCD_HEIGHT - (BYTE_HEIGHT*2), LCD_WIDTH-20, LCD_HEIGHT, textSelect(LABEL_TOUCH_TO_EXIT));
 
   while (!isPress()) loopBackEnd();
-  BUZZER_PLAY(sound_keypress);
+  BUZZER_PLAY(SOUND_KEYPRESS);
   while (isPress()) loopBackEnd();
 
   GUI_RestoreColorDefault();
-  infoMenu.cur--;
+  CLOSE_MENU();
 }
 
 void menuSettings(void)
@@ -171,34 +170,34 @@ void menuSettings(void)
 
   menuDrawPage(&settingsItems);
 
-  while (infoMenu.menu[infoMenu.cur] == menuSettings)
+  while (MENU_IS(menuSettings))
   {
     key_num = menuKeyGetValue();
     switch (key_num)
     {
       case KEY_ICON_0:
-        infoMenu.menu[++infoMenu.cur] = menuScreenSettings;
+        OPEN_MENU(menuScreenSettings);
         break;
 
       case KEY_ICON_1:
         mustStoreCmd("M503 S0\n");
-        infoMenu.menu[++infoMenu.cur] = menuMachineSettings;
+        OPEN_MENU(menuMachineSettings);
         break;
 
       case KEY_ICON_2:
-        infoMenu.menu[++infoMenu.cur] = menuFeatureSettings;
+        OPEN_MENU(menuFeatureSettings);
         break;
 
       case KEY_ICON_3:
-        infoMenu.menu[++infoMenu.cur] = menuInfo;
+        OPEN_MENU(menuInfo);
         break;
 
       case KEY_ICON_4:
-        infoMenu.menu[++infoMenu.cur] = menuConnectionSettings;
+        OPEN_MENU(menuConnectionSettings);
         break;
 
       case KEY_ICON_7:
-        infoMenu.cur--;
+        CLOSE_MENU();
         break;
 
       default:
