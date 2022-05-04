@@ -379,7 +379,7 @@
 #define SHOW_BTT_BOOTSCREEN
 
 // Bootscreen logo time in ms
-#define BTT_BOOTSCREEN_TIME 3000
+#define BTT_BOOTSCREEN_TIME 4000
 
 // Enable alternative Move Menu Buttons Layout matching the direction of actual printer axis
 // Update the icons from alternate icon folder.
@@ -571,7 +571,7 @@
  *    If you choose "Base64 PNG" on such a low RAM device it will automatically
  *    downgraded to "RGB565 bitmap" option.
  */
-#define THUMBNAIL_PARSER 1  // Default: 0
+#define THUMBNAIL_PARSER 2  // Default: 0
 
 //===========================================================================
 //=========================== Other Settings ================================
