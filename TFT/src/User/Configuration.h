@@ -50,7 +50,7 @@
  *
  *   Options: [disable: 0, enable: 1]
  */
-#define EMULATED_M600 1  // Default: 1
+#define EMULATED_M600 0  // Default: 1
 
 /**
  * Emulated M109 And M190
@@ -172,7 +172,7 @@
  *     POPUP: Display a popup window for user confirmation.
  *     TOAST: A non-blocking Toast notification is displayed for few seconds. No user interaction is needed.
  */
-#define ACK_NOTIFICATION 2  // Default: 1
+#define ACK_NOTIFICATION 0  // Default: 1
 
 /**
  * Files Sorting
@@ -1319,7 +1319,7 @@
  * The color of the progress bar during print.
  *   Options: [Orange: 0, Yellow: 1, Red: 2, Green: 3, Blue: 4, Cyan: 5, Magenta: 6, Purple: 7, Lime: 8, Gray: 9]
  */
-#define PROGRESS_BAR_COLOR 9  // Default: 0
+#define PROGRESS_BAR_COLOR 3  // Default: 0
 
 /**
  * Progress Bar Layout (Printing menu)

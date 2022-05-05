@@ -436,8 +436,6 @@ void drawPrintInfo(void)
 void stopConfirm(void)
 {
   printAbort();
-  // MYEDIT : Restore knob LED color.
-  WS2812_Send_DAT(led_color[infoSettings.knob_led_color]);
 }
 
 void printSummaryPopup(void)
@@ -571,10 +569,10 @@ void menuPrinting(void)
       if (time != getPrintTime())
       {
         time = getPrintTime();
-        // MYEDIT : Add knob LED animation.
-        if(isPrinting()){
-          knob_LED_Rotate(LED_GREEN);
-        }
+        // // MYEDIT : Add knob LED animation.
+        // if(isPrinting()){
+        //   knob_LED_Rotate(LED_GREEN);
+        // }
         if (progDisplayType == ELAPSED_REMAINING)
           reDrawPrintingValue(ICON_POS_TIM, LIVE_INFO_TOP_ROW | LIVE_INFO_BOTTOM_ROW);
         else
@@ -707,10 +705,10 @@ void menuPrinting(void)
         }
         else
         { // Main button
-          // MYEDIT : Turn off LED.
-          ledSendValue(&ledOff);
-          // MYEDIT : Restore knob LED color.
-          WS2812_Send_DAT(led_color[infoSettings.knob_led_color]);
+          // // MYEDIT : Turn off LED.
+          // ledSendValue(&ledOff);
+          // // MYEDIT : Restore knob LED color.
+          // WS2812_Send_DAT(led_color[infoSettings.knob_led_color]);
           clearInfoFile();
           infoMenu.cur = 0;
         }
@@ -739,10 +737,10 @@ void menuPrinting(void)
         }
         else
         { // Back button
-          // MYEDIT : Turn off LED.
-          ledSendValue(&ledOff);
-          // MYEDIT : Restore knob LED color.
-          WS2812_Send_DAT(led_color[infoSettings.knob_led_color]);
+          // // MYEDIT : Turn off LED.
+          // ledSendValue(&ledOff);
+          // // MYEDIT : Restore knob LED color.
+          // WS2812_Send_DAT(led_color[infoSettings.knob_led_color]);
           CLOSE_MENU();
         }
         break;

@@ -463,11 +463,6 @@ bool printStart(void)
 
 void printEnd(void)
 {
-  // MYEDIT : Change LED color when completed.
-  ledSendValue(&ledGreen);
-  // MYEDIT : Change knob LED color when completed.
-  WS2812_Send_DAT(LED_GREEN);
-  BUZZER_PLAY(sound_success);
   // in case of printing from Marlin Mode (infoPrinting.printing set to "false"),
   // always force infoHost.status to "HOST_STATUS_IDLE"
   if (!infoPrinting.printing)

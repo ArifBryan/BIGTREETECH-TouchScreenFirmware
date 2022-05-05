@@ -315,10 +315,10 @@ void loopVolumeSource(void)
       volumeReminderMessage(labelSDStates[i][volumeSrcStatus[i]], SYS_STATUS_NORMAL);
       // MYEDIT : Play sound when volume inserted and removed.
       if(volumeSrcStatus[i]){
-        BUZZER_PLAY(sound_ok);
+        Buzzer_play(SOUND_OK);
       }
       else{
-        BUZZER_PLAY(sound_cancel);
+        Buzzer_play(SOUND_CANCEL);
       }
     }
   }

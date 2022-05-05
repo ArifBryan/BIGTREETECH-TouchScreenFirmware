@@ -316,10 +316,10 @@ void hostActionCommands(void)
           type = DIALOG_TYPE_ERROR;
 
         if (MENU_IS_NOT(menuStatus))  // don't show it when in menuStatus
-          addToast(DIALOG_TYPE_INFO, dmaL2Cache + index);
+          addToast(type, dmaL2Cache + index);
 
         if (infoSettings.notification_m117 == ENABLED)
-          addNotification(DIALOG_TYPE_INFO, (char *)magic_echo, (char *)dmaL2Cache + index, false);
+          addNotification(type, (char *)magic_echo, (char *)dmaL2Cache + index, false);
       }
     }
   }
